@@ -3,8 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Perencana pengisian bahan bakar untuk perjalanan darat — hitung jarak tempuh, jumlah pengisian, dan interval pemberhentian.">
-<title>Perencana Pengisian Bahan Bakar Perjalanan Darat</title>
+<meta name="description" content="Perencana pengisian bahan bakar Pertalite, Pertamax, Solar untuk perjalanan darat — hitung jarak tempuh, jumlah pengisian, dan interval pemberhentian.">
+<meta name="theme-color" content="#0b1120">
+<title data-i18n="title">Perencana Bahan Bakar Pertalite</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="styles.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,6 +15,14 @@
 </head>
 <body>
 <div class="app">
+  <div class="topbar">
+    <div class="lang-toggle" role="group" aria-label="Bahasa / Language">
+      <button id="langId" class="active" type="button" title="Indonesia">ID</button>
+      <button id="langEn" type="button" title="English">EN</button>
+    </div>
+    <button id="themeToggle" class="icon-btn" type="button" aria-label="Ganti tema (terang/gelap)">🌙</button>
+  </div>
+
   <header class="app-header">
     <div class="brand">
       <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -22,9 +33,9 @@
         <circle cx="7.5" cy="10" r=".6" fill="currentColor"/>
         <circle cx="10" cy="10" r=".6" fill="currentColor"/>
       </svg>
-      <h1>Perencana Bahan Bakar Pertalite</h1>
+      <h1 data-i18n="title">Perencana Bahan Bakar Pertalite</h1>
     </div>
-    <p class="tagline">Simulasikan kebutuhan isi ulang bahan bakar untuk perjalanan darat Anda</p>
+    <p class="tagline" data-i18n="tagline">Simulasikan kebutuhan isi ulang bahan bakar untuk perjalanan darat Anda</p>
   </header>
 
   <div class="unit-toggle" role="tablist" aria-label="Pilih satuan pengukuran">
@@ -34,10 +45,10 @@
 
   <main>
     <section class="panel" aria-labelledby="inputs-title">
-      <h2 id="inputs-title" class="panel-title">Parameter Perjalanan</h2>
+      <h2 id="inputs-title" class="panel-title" data-i18n="panelParams">Parameter Perjalanan</h2>
       <div class="inputs-grid">
         <div class="input-group">
-          <label for="tripDistance">Jarak Total Perjalanan</label>
+          <label for="tripDistance" data-i18n="distance">Jarak Total Perjalanan</label>
           <div class="input-row">
             <input type="number" id="tripDistance" value="800" min="1" step="10" inputmode="decimal" aria-describedby="unitDistance">
             <input type="range" id="tripDistanceSlider" min="10" max="8000" value="800" step="10" aria-label="Jarak total perjalanan">
@@ -46,7 +57,7 @@
         </div>
 
         <div class="input-group">
-          <label for="tankSize">Ukuran Tangki Bahan Bakar</label>
+          <label for="tankSize" data-i18n="tank">Ukuran Tangki Bahan Bakar</label>
           <div class="input-row">
             <input type="number" id="tankSize" value="45" min="1" max="800" step="0.5" inputmode="decimal" aria-describedby="unitTank">
             <input type="range" id="tankSizeSlider" min="5" max="800" value="45" step="0.5" aria-label="Ukuran tangki bahan bakar">
@@ -55,7 +66,7 @@
         </div>
 
         <div class="input-group">
-          <label for="fuelEfficiency">Efisiensi Bahan Bakar</label>
+          <label for="fuelEfficiency" data-i18n="efficiency">Efisiensi Bahan Bakar</label>
           <div class="input-row">
             <input type="number" id="fuelEfficiency" value="7" min="1" max="25" step="0.1" inputmode="decimal" aria-describedby="unitEfficiency">
             <input type="range" id="fuelEfficiencySlider" min="1" max="25" value="7" step="0.1" aria-label="Efisiensi bahan bakar">
@@ -66,7 +77,7 @@
     </section>
 
     <section class="panel" aria-labelledby="fuel-title">
-      <h2 id="fuel-title" class="panel-title">Tingkat Bahan Bakar Saat Ini</h2>
+      <h2 id="fuel-title" class="panel-title" data-i18n="panelFuel">Tingkat Bahan Bakar Saat Ini</h2>
       <div class="fuel-dashboard">
         <div class="gauge-wrap">
           <svg class="gauge" viewBox="0 0 120 120" role="img" aria-label="Tingkat bahan bakar">
@@ -102,49 +113,72 @@
             <span class="fuel-pct" id="fuelPct">75%</span>
           </div>
           <div class="fuel-meta">
-            <span>Bensin tersisa: <strong id="fuelRemaining">11.3 galon</strong></span>
-            <span>Jarak aman: <strong id="safeRangeLabel">—</strong></span>
+            <span class="meta-item"><span class="meta-label" data-i18n="fuelRemaining">Bensin tersisa:</span> <strong id="fuelRemaining">—</strong></span>
+            <span class="meta-item"><span class="meta-label" data-i18n="safeRange">Jarak aman (dengan cadangan):</span> <strong id="safeRangeLabel">—</strong></span>
           </div>
         </div>
       </div>
     </section>
 
+    <section class="panel" aria-labelledby="strategy-title">
+      <h2 id="strategy-title" class="panel-title" data-i18n="panelStrategy">Strategi &amp; Pengaturan</h2>
+      <div class="strategy-grid">
+        <div class="input-group">
+          <label for="reserve" data-i18n="reserve">Cadangan Bahan Bakar Aman</label>
+          <div class="input-row">
+            <input type="range" id="reserve" min="0" max="25" value="10" step="1" aria-label="Cadangan bahan bakar dalam persen">
+            <span class="fuel-pct amber" id="reserveDisplay">10%</span>
+          </div>
+          <p class="hint" data-i18n="reserveHint">Minimal sisa bensin sebelum mengisi ulang, agar tak kehabisan di jalan.</p>
+        </div>
+
+        <div class="input-group">
+          <label for="avgSpeed" data-i18n="speed">Kecepatan Rata-rata</label>
+          <div class="input-row">
+            <input type="number" id="avgSpeed" value="80" min="10" max="200" step="5" inputmode="numeric">
+            <span class="unit-label" id="avgSpeedUnit">km/jam</span>
+          </div>
+          <p class="hint" data-i18n="speedHint">Dipakai untuk memperkirakan waktu tempuh.</p>
+        </div>
+      </div>
+    </section>
+
     <section class="panel" aria-labelledby="results-title">
-      <h2 id="results-title" class="panel-title">Hasil Perhitungan</h2>
+      <h2 id="results-title" class="panel-title" data-i18n="panelResults">Hasil Perhitungan</h2>
       <div class="results-grid">
         <div class="result-card range-card">
           <div class="result-icon">⛽</div>
-          <div class="result-label">Jarak Tempuh Saat Ini</div>
+          <div class="result-label" data-i18n="range">Jarak Tempuh Saat Ini</div>
           <div class="result-value" id="currentRange">0</div>
           <div class="result-unit" id="currentRangeUnit">—</div>
         </div>
         <div class="result-card stops-card">
           <div class="result-icon">🛢️</div>
-          <div class="result-label">Pengisian Dibutuhkan</div>
+          <div class="result-label" data-i18n="stops">Pengisian Dibutuhkan</div>
           <div class="result-value" id="stopsNeeded">0</div>
           <div class="result-unit" id="stopsNeededUnit">—</div>
         </div>
         <div class="result-card interval-card">
           <div class="result-icon">📍</div>
-          <div class="result-label">Interval Pemberhentian</div>
+          <div class="result-label" data-i18n="interval">Interval Pemberhentian</div>
           <div class="result-value" id="stopInterval">0</div>
           <div class="result-unit" id="stopIntervalUnit">—</div>
         </div>
         <div class="result-card cost-card">
           <div class="result-icon">💰</div>
-          <div class="result-label">Perkiraan Biaya Bahan Bakar</div>
+          <div class="result-label" data-i18n="cost">Perkiraan Biaya</div>
           <div class="result-value" id="fuelCost">0</div>
           <div class="result-unit" id="fuelCostUnit">—</div>
         </div>
         <div class="result-card consumption-card">
           <div class="result-icon">🧮</div>
-          <div class="result-label">Total Bensin Terpakai</div>
+          <div class="result-label" data-i18n="consumption">Total Bensin Terpakai</div>
           <div class="result-value" id="totalFuel">0</div>
           <div class="result-unit" id="totalFuelUnit">—</div>
         </div>
         <div class="result-card time-card">
           <div class="result-icon">⏱️</div>
-          <div class="result-label">Waktu Estimasi (80 km/jam)</div>
+          <div class="result-label" data-i18n="time">Estimasi Waktu Tempuh</div>
           <div class="result-value" id="travelTime">0</div>
           <div class="result-unit" id="travelTimeUnit">—</div>
         </div>
@@ -152,16 +186,18 @@
     </section>
 
     <section class="panel" aria-labelledby="map-title">
-      <h2 id="map-title" class="panel-title">Peta Perjalanan</h2>
+      <h2 id="map-title" class="panel-title" data-i18n="panelMap">Peta Perjalanan</h2>
       <div class="road-map" id="roadMap" aria-live="polite"></div>
       <div id="pumpSection"></div>
+      <div class="risk-banner" id="riskBanner" role="status"></div>
       <div class="note-box" id="noteBox"></div>
+      <div id="stopTableWrap"></div>
     </section>
 
     <section class="panel price-panel" aria-labelledby="price-title">
-      <h2 id="price-title" class="panel-title">Jenis &amp; Harga Bahan Bakar</h2>
+      <h2 id="price-title" class="panel-title" data-i18n="panelFuelType">Jenis &amp; Harga Bahan Bakar</h2>
       <div class="price-row">
-        <label for="fuelType">Pilih jenis bahan bakar</label>
+        <label for="fuelType" data-i18n="chooseFuel">Pilih jenis bahan bakar</label>
         <select id="fuelType" class="fuel-select" aria-describedby="fuelPriceDisplay">
           <option value="pertalite" selected>Pertalite — Rp 10.000/liter</option>
           <option value="pertamax">Pertamax — Rp 15.000/liter</option>
@@ -169,11 +205,23 @@
         </select>
         <span class="fuel-price-display" id="fuelPriceDisplay">Rp 10.000 / liter</span>
       </div>
-      <p class="price-note">Estimasi biaya dihitung otomatis dari harga jenis bahan bakar yang dipilih. Total Pertalite/Pertamax/Solar ditampilkan di kartu hasil.</p>
+      <p class="price-note" data-i18n="fuelNote">Estimasi biaya dihitung otomatis dari harga jenis bahan bakar yang dipilih. Total bahan bakar ditampilkan di kartu hasil.</p>
+    </section>
+
+    <section class="panel" aria-labelledby="plan-title">
+      <h2 id="plan-title" class="panel-title" data-i18n="panelPlan">Simpan &amp; Bagikan Rencana</h2>
+      <div class="plan-row">
+        <input type="text" id="tripName" maxlength="40" data-i18n-placeholder="tripNamePh" placeholder="Nama perjalanan (opsional)">
+        <button id="btnSaveTrip" class="btn btn-primary" type="button" data-i18n="saveTrip">💾 Simpan Rencana</button>
+        <button id="btnCopySummary" class="btn btn-secondary" type="button" data-i18n="copyPlan">📋 Salin Ringkasan</button>
+      </div>
+      <span class="copy-feedback" id="copyFeedback"></span>
+      <h3 class="sub-title" data-i18n="savedTrips">Rencana tersimpan</h3>
+      <ul id="savedTrips" class="saved-list"></ul>
     </section>
   </main>
 
-  <footer>Perencana Pengisian Bahan Bakar — Hitungan bersifat estimasi &amp; untuk referensi saja</footer>
+  <footer data-i18n="footer">Perencana Bahan Bakar — Hitungan bersifat estimasi &amp; untuk referensi saja</footer>
 </div>
 
 <script src="script.js"></script>

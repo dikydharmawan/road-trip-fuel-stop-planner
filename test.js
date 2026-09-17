@@ -16,9 +16,12 @@ function makeEl(id, attrs = {}) {
     step: attrs.step || '1',
     textContent: '',
     innerHTML: '',
+    className: '',
     style: {},
     classList: { toggle() {} },
     setAttribute() {},
+    closest: () => null,
+    dataset: {},
     _handlers: {},
     addEventListener(type, fn) {
       this._handlers[type] = fn;
@@ -85,34 +88,50 @@ function expectString(label, got, want) {
   }
 }
 
-global.document = { getElementById: getEl };
+global.document = {
+  getElementById: getEl,
+  querySelector: () => null,
+  querySelectorAll: () => [],
+  body: makeEl('body')
+};
 global.localStorage = {
   getItem: (k) => (k in storage ? storage[k] : null),
   setItem: (k, v) => { storage[k] = v; }
 };
+global.navigator = { clipboard: { writeText: () => Promise.resolve() } };
 
 seedHtmlInputs();
 elements.fuelType = makeEl('fuelType', { value: 'pertalite' });
-['btnImperial', 'btnMetric', 'unitDistance', 'unitTank', 'unitEfficiency', 'fuelPriceDisplay',
+elements.tripName = makeEl('tripName', { value: '' });
+['btnImperial', 'btnMetric', 'langId', 'langEn', 'themeToggle',
+ 'unitDistance', 'unitTank', 'unitEfficiency', 'avgSpeedUnit', 'fuelPriceDisplay',
  'currentRange', 'currentRangeUnit', 'stopsNeeded', 'stopsNeededUnit',
  'stopInterval', 'stopIntervalUnit', 'fuelFill', 'fuelFillText', 'fuelPct',
  'gaugeFill', 'gaugeNeedle', 'gaugeReadout', 'totalFuel', 'totalFuelUnit',
  'fuelCost', 'fuelCostUnit', 'travelTime', 'travelTimeUnit',
- 'roadMap', 'pumpSection', 'noteBox'].forEach(getEl);
+ 'fuelRemaining', 'safeRangeLabel',
+ 'roadMap', 'pumpSection', 'noteBox', 'riskBanner', 'stopTableWrap',
+ 'savedTrips', 'copyFeedback', 'reserveDisplay',
+ 'btnSaveTrip', 'btnCopySummary'].forEach(getEl);
 
 eval(js);
 
-console.log('\n=== Metrik Pertalite (default: 800 km, 45 L, 7 L/100km, 75%, Rp 10.000) ===');
+console.log('\n=== Metrik Pertalite (800 km, 45 L, 7 L/100km, 75%, cadangan 10%, Rp 10.000) ===');
 expect('jarak tempuh saat ini (km)', elements.currentRange.textContent, 482.1);
 expect('jumlah pengisian', elements.stopsNeeded.textContent, 1);
-expect('interval pemberhentian (km)', elements.stopInterval.textContent, 317.9);
+expect('interval pemberhentian (km)', elements.stopInterval.textContent, 382.1);
+expect('jarak aman (km)', elements.safeRangeLabel.textContent, 417.9);
+expectTruthy('bensin tersisa tampil', elements.fuelRemaining.textContent.includes('33') && elements.fuelRemaining.textContent.includes('liter'));
 expectTruthy('peta menampilkan pemberhentian', elements.roadMap.innerHTML.includes('road-stop'));
 expectTruthy('petunjuk berisi Berhenti', elements.noteBox.innerHTML.includes('Berhenti'));
+expectTruthy('tabel stop tampil (posisi 418)', elements.stopTableWrap.innerHTML.includes('418'));
 expect('total Pertalite terpakai (L)', elements.totalFuel.textContent, 56);
 expectTruthy('biaya Pertalite ~Rp 560.000', elements.fuelCost.textContent.includes('560.000'));
 expectTruthy('format Rupiah', elements.fuelCost.textContent.startsWith('Rp'));
 expectString('waktu tempuh', elements.travelTime.textContent, '10 jam');
 expectString('gauge readout', elements.gaugeReadout.textContent, '75%');
+expectTruthy('banner risiko = warn', elements.riskBanner.className.includes('warn'));
+expectTruthy('banner menyebut biaya', elements.riskBanner.textContent.includes('560.000'));
 
 console.log('\n=== Pilihan jenis bahan bakar ===');
 elements.fuelType.value = 'pertamax';
@@ -147,6 +166,8 @@ expect('jumlah pengisian', elements.stopsNeeded.textContent, 0);
 expect('interval = jarak total', elements.stopInterval.textContent, 100);
 expectTruthy('peta tidak menampilkan pemberhentian', !elements.roadMap.innerHTML.includes('road-stop'));
 expectTruthy('pesan bahan bakar cukup', elements.noteBox.innerHTML.includes('cukup'));
+expectTruthy('banner risiko = success', elements.riskBanner.className.includes('success'));
+expectString('tabel stop kosong', elements.stopTableWrap.innerHTML, '');
 
 console.log('\n=== Kembali ke Metrik ===');
 elements.btnMetric.fire('click');
@@ -155,8 +176,23 @@ expect('efisiensi (L/100km)', elements.fuelEfficiency.value, 7);
 expectString('label jarak = km', elements.unitDistance.textContent, 'km');
 expectTruthy('display harga per liter', elements.fuelPriceDisplay.textContent.includes('/ liter'));
 
+console.log('\n=== Ganti bahasa ke Inggris ===');
+elements.langEn.fire('click');
+expectTruthy('stops unit bahasa Inggris', elements.stopsNeededUnit.textContent.includes('refill'));
+expectTruthy('banner bahasa Inggris', /refill|enough fuel/.test(elements.riskBanner.textContent));
+elements.langId.fire('click');
+
+console.log('\n=== Simpan & muat rencana ===');
+elements.btnSaveTrip.fire('click');
+expectTruthy('rencana tersimpan ditampilkan', elements.savedTrips.innerHTML.includes('Perjalanan 1'));
+elements.tripDistance.value = '999';
+elements.tripDistance.fire('input');
+loadTrip(0);
+expect('jarak dipulihkan setelah load', parseFloat(elements.tripDistance.value), 160.9);
+
 console.log('\n=== Persistensi local storage ===');
-expectTruthy('state tersimpan', Object.keys(storage).length === 1 && Boolean(storage['fuel-trip-planner']));
+expectTruthy('state utama tersimpan', Boolean(storage['fuel-trip-planner']));
+expectTruthy('daftar rencana tersimpan', Boolean(storage['fuel-trip-saved']));
 
 console.log('\nHasil: ' + passed + ' lulus, ' + failed + ' gagal');
 process.exit(failed > 0 ? 1 : 0);
