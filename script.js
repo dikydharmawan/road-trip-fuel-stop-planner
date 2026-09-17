@@ -21,7 +21,7 @@ const L100KM_PER_MPG = 235.214;
 const STORAGE_KEY = 'fuel-trip-planner';
 const GAUGE_ARC_LENGTH = Math.PI * 52;
 
-let currentUnit = 'imperial';
+let currentUnit = 'metric';
 
 const $ = (id) => document.getElementById(id);
 
@@ -183,8 +183,8 @@ function calculate() {
   $('totalFuel').textContent = formatFuel(totalFuel);
   $('totalFuelUnit').textContent = unit.tank;
 
-  $('fuelCost').textContent = price > 0 ? '$' + cost.toLocaleString('id-ID', { maximumFractionDigits: 2 }) : '—';
-  $('fuelCostUnit').textContent = price > 0 ? 'estimasi biaya' : 'masukkan harga di bawah';
+  $('fuelCost').textContent = price > 0 ? 'Rp ' + Math.round(cost).toLocaleString('id-ID') : '—';
+  $('fuelCostUnit').textContent = price > 0 ? 'estimasi biaya Pertalite' : 'masukkan harga di bawah';
 
   $('travelTime').textContent = dist > 0 ? formatTime(travelHours) : '—';
   $('travelTimeUnit').textContent = 'dengan kecepatan rata-rata ' + unit.avgSpeed + ' ' + (currentUnit === 'imperial' ? 'mph' : 'km/jam');

@@ -22,14 +22,14 @@
         <circle cx="7.5" cy="10" r=".6" fill="currentColor"/>
         <circle cx="10" cy="10" r=".6" fill="currentColor"/>
       </svg>
-      <h1>Perencana Pengisian Bahan Bakar</h1>
+      <h1>Perencana Bahan Bakar Pertalite</h1>
     </div>
-    <p class="tagline">Hitung kebutuhan pengisian bahan bakar untuk perjalanan darat Anda</p>
+    <p class="tagline">Simulasikan kebutuhan isi ulang bahan bakar untuk perjalanan darat Anda</p>
   </header>
 
   <div class="unit-toggle" role="tablist" aria-label="Pilih satuan pengukuran">
-    <button id="btnImperial" class="active" type="button" role="tab" aria-selected="true">Imperial (mil/gal)</button>
-    <button id="btnMetric" type="button" role="tab" aria-selected="false">Metrik (km/L)</button>
+    <button id="btnImperial" type="button" role="tab" aria-selected="false">Imperial (mil/gal)</button>
+    <button id="btnMetric" class="active" type="button" role="tab" aria-selected="true">Metrik (km/L)</button>
   </div>
 
   <main>
@@ -39,27 +39,27 @@
         <div class="input-group">
           <label for="tripDistance">Jarak Total Perjalanan</label>
           <div class="input-row">
-            <input type="number" id="tripDistance" value="500" min="1" step="10" inputmode="decimal" aria-describedby="unitDistance">
-            <input type="range" id="tripDistanceSlider" min="10" max="5000" value="500" step="10" aria-label="Jarak total perjalanan">
-            <span class="unit-label" id="unitDistance">mil</span>
+            <input type="number" id="tripDistance" value="800" min="1" step="10" inputmode="decimal" aria-describedby="unitDistance">
+            <input type="range" id="tripDistanceSlider" min="10" max="8000" value="800" step="10" aria-label="Jarak total perjalanan">
+            <span class="unit-label" id="unitDistance">km</span>
           </div>
         </div>
 
         <div class="input-group">
           <label for="tankSize">Ukuran Tangki Bahan Bakar</label>
           <div class="input-row">
-            <input type="number" id="tankSize" value="15" min="1" max="200" step="0.5" inputmode="decimal" aria-describedby="unitTank">
-            <input type="range" id="tankSizeSlider" min="5" max="200" value="15" step="0.5" aria-label="Ukuran tangki bahan bakar">
-            <span class="unit-label" id="unitTank">galon</span>
+            <input type="number" id="tankSize" value="45" min="1" max="800" step="0.5" inputmode="decimal" aria-describedby="unitTank">
+            <input type="range" id="tankSizeSlider" min="5" max="800" value="45" step="0.5" aria-label="Ukuran tangki bahan bakar">
+            <span class="unit-label" id="unitTank">liter</span>
           </div>
         </div>
 
         <div class="input-group">
           <label for="fuelEfficiency">Efisiensi Bahan Bakar</label>
           <div class="input-row">
-            <input type="number" id="fuelEfficiency" value="30" min="1" max="250" step="0.5" inputmode="decimal" aria-describedby="unitEfficiency">
-            <input type="range" id="fuelEfficiencySlider" min="1" max="250" value="30" step="0.5" aria-label="Efisiensi bahan bakar">
-            <span class="unit-label" id="unitEfficiency">MPG</span>
+            <input type="number" id="fuelEfficiency" value="7" min="1" max="25" step="0.1" inputmode="decimal" aria-describedby="unitEfficiency">
+            <input type="range" id="fuelEfficiencySlider" min="1" max="25" value="7" step="0.1" aria-label="Efisiensi bahan bakar">
+            <span class="unit-label" id="unitEfficiency">L/100km</span>
           </div>
         </div>
       </div>
@@ -159,15 +159,15 @@
     </section>
 
     <section class="panel price-panel" aria-labelledby="price-title">
-      <h2 id="price-title" class="panel-title">Harga Bahan Bakar (opsional)</h2>
+      <h2 id="price-title" class="panel-title">Harga Pertalite (opsional)</h2>
       <div class="price-row">
-        <label for="fuelPrice">Harga per <span id="priceUnit">galon</span></label>
+        <label for="fuelPrice">Harga per <span id="priceUnit">liter</span></label>
         <div class="price-input-wrap">
-          <span class="currency">$</span>
-          <input type="number" id="fuelPrice" value="3.50" min="0" step="0.01" inputmode="decimal">
+          <span class="currency">Rp</span>
+          <input type="number" id="fuelPrice" value="10000" min="0" step="500" inputmode="decimal">
         </div>
       </div>
-      <p class="price-note">Biaya dihitung ulang otomatis setiap kali harga berubah. Set 0 untuk menonaktifkan.</p>
+      <p class="price-note">Estimasi biaya dihitung ulang otomatis setiap harga berubah. Set 0 untuk menonaktifkan perhitungan biaya.</p>
     </section>
   </main>
 
