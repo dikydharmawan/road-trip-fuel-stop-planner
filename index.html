@@ -159,15 +159,17 @@
     </section>
 
     <section class="panel price-panel" aria-labelledby="price-title">
-      <h2 id="price-title" class="panel-title">Harga Pertalite (opsional)</h2>
+      <h2 id="price-title" class="panel-title">Jenis &amp; Harga Bahan Bakar</h2>
       <div class="price-row">
-        <label for="fuelPrice">Harga per <span id="priceUnit">liter</span></label>
-        <div class="price-input-wrap">
-          <span class="currency">Rp</span>
-          <input type="number" id="fuelPrice" value="10000" min="0" step="500" inputmode="decimal">
-        </div>
+        <label for="fuelType">Pilih jenis bahan bakar</label>
+        <select id="fuelType" class="fuel-select" aria-describedby="fuelPriceDisplay">
+          <option value="pertalite" selected>Pertalite — Rp 10.000/liter</option>
+          <option value="pertamax">Pertamax — Rp 15.000/liter</option>
+          <option value="solar">Solar — Rp 5.000/liter</option>
+        </select>
+        <span class="fuel-price-display" id="fuelPriceDisplay">Rp 10.000 / liter</span>
       </div>
-      <p class="price-note">Estimasi biaya dihitung ulang otomatis setiap harga berubah. Set 0 untuk menonaktifkan perhitungan biaya.</p>
+      <p class="price-note">Estimasi biaya dihitung otomatis dari harga jenis bahan bakar yang dipilih. Total Pertalite/Pertamax/Solar ditampilkan di kartu hasil.</p>
     </section>
   </main>
 

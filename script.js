@@ -21,6 +21,12 @@ const L100KM_PER_MPG = 235.214;
 const STORAGE_KEY = 'fuel-trip-planner';
 const GAUGE_ARC_LENGTH = Math.PI * 52;
 
+const FUELS = {
+  pertalite: { name: 'Pertalite', price: 10000 },
+  pertamax: { name: 'Pertamax', price: 15000 },
+  solar: { name: 'Solar', price: 5000 }
+};
+
 let currentUnit = 'metric';
 
 const $ = (id) => document.getElementById(id);
@@ -63,7 +69,6 @@ function setUnit(unit) {
   $('unitDistance').textContent = UNITS[unit].distance;
   $('unitTank').textContent = UNITS[unit].tank;
   $('unitEfficiency').textContent = UNITS[unit].efficiency;
-  $('priceUnit').textContent = UNITS[unit].pricePer;
 
   convertValues(prevUnit, unit);
   onAnyChange();
@@ -145,7 +150,8 @@ function calculate() {
   const tank = parseFloat($('tankSize').value) || 1;
   const eff = parseFloat($('fuelEfficiency').value) || 1;
   const fuelPct = clamp($('fuelLevel').value, 0, 100);
-  const price = parseFloat($('fuelPrice').value) || 0;
+  const fuel = FUELS[$('fuelType').value] || FUELS.pertalite;
+  const price = fuel.price;
 
   const unit = UNITS[currentUnit];
 
@@ -181,10 +187,12 @@ function calculate() {
   $('stopIntervalUnit').textContent = unit.distance + ' per pemberhentian';
 
   $('totalFuel').textContent = formatFuel(totalFuel);
-  $('totalFuelUnit').textContent = unit.tank;
+  $('totalFuelUnit').textContent = unit.tank + ' ' + fuel.name;
 
-  $('fuelCost').textContent = price > 0 ? 'Rp ' + Math.round(cost).toLocaleString('id-ID') : '—';
-  $('fuelCostUnit').textContent = price > 0 ? 'estimasi biaya Pertalite' : 'masukkan harga di bawah';
+  $('fuelCost').textContent = 'Rp ' + Math.round(cost).toLocaleString('id-ID');
+  $('fuelCostUnit').textContent = 'estimasi biaya ' + fuel.name;
+
+  $('fuelPriceDisplay').textContent = 'Rp ' + price.toLocaleString('id-ID') + ' / ' + unit.pricePer;
 
   $('travelTime').textContent = dist > 0 ? formatTime(travelHours) : '—';
   $('travelTimeUnit').textContent = 'dengan kecepatan rata-rata ' + unit.avgSpeed + ' ' + (currentUnit === 'imperial' ? 'mph' : 'km/jam');
@@ -300,7 +308,7 @@ function saveState() {
     tank: $('tankSize').value,
     efficiency: $('fuelEfficiency').value,
     fuelLevel: $('fuelLevel').value,
-    fuelPrice: $('fuelPrice').value
+    fuelType: $('fuelType').value
   };
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -327,7 +335,7 @@ function restoreState() {
   $('fuelEfficiency').value = state.efficiency;
   $('fuelEfficiencySlider').value = state.efficiency;
   $('fuelLevel').value = state.fuelLevel;
-  $('fuelPrice').value = state.fuelPrice;
+  $('fuelType').value = state.fuelType || 'pertalite';
 
   $('btnImperial').classList.toggle('active', currentUnit === 'imperial');
   $('btnMetric').classList.toggle('active', currentUnit === 'metric');
@@ -337,7 +345,6 @@ function restoreState() {
   $('unitDistance').textContent = UNITS[currentUnit].distance;
   $('unitTank').textContent = UNITS[currentUnit].tank;
   $('unitEfficiency').textContent = UNITS[currentUnit].efficiency;
-  $('priceUnit').textContent = UNITS[currentUnit].pricePer;
 }
 
 function onAnyChange() {
@@ -350,7 +357,7 @@ function onAnyChange() {
 $('btnImperial').addEventListener('click', () => setUnit('imperial'));
 $('btnMetric').addEventListener('click', () => setUnit('metric'));
 $('fuelLevel').addEventListener('input', onAnyChange);
-$('fuelPrice').addEventListener('input', onAnyChange);
+$('fuelType').addEventListener('change', onAnyChange);
 
 linkInputs('tripDistance', 'tripDistanceSlider');
 linkInputs('tankSize', 'tankSizeSlider');

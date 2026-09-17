@@ -92,7 +92,8 @@ global.localStorage = {
 };
 
 seedHtmlInputs();
-['btnImperial', 'btnMetric', 'unitDistance', 'unitTank', 'unitEfficiency', 'priceUnit',
+elements.fuelType = makeEl('fuelType', { value: 'pertalite' });
+['btnImperial', 'btnMetric', 'unitDistance', 'unitTank', 'unitEfficiency', 'fuelPriceDisplay',
  'currentRange', 'currentRangeUnit', 'stopsNeeded', 'stopsNeededUnit',
  'stopInterval', 'stopIntervalUnit', 'fuelFill', 'fuelFillText', 'fuelPct',
  'gaugeFill', 'gaugeNeedle', 'gaugeReadout', 'totalFuel', 'totalFuelUnit',
@@ -108,10 +109,25 @@ expect('interval pemberhentian (km)', elements.stopInterval.textContent, 317.9);
 expectTruthy('peta menampilkan pemberhentian', elements.roadMap.innerHTML.includes('road-stop'));
 expectTruthy('petunjuk berisi Berhenti', elements.noteBox.innerHTML.includes('Berhenti'));
 expect('total Pertalite terpakai (L)', elements.totalFuel.textContent, 56);
-expectTruthy('biaya ~Rp 560.000', elements.fuelCost.textContent.includes('560.000'));
+expectTruthy('biaya Pertalite ~Rp 560.000', elements.fuelCost.textContent.includes('560.000'));
 expectTruthy('format Rupiah', elements.fuelCost.textContent.startsWith('Rp'));
 expectString('waktu tempuh', elements.travelTime.textContent, '10 jam');
 expectString('gauge readout', elements.gaugeReadout.textContent, '75%');
+
+console.log('\n=== Pilihan jenis bahan bakar ===');
+elements.fuelType.value = 'pertamax';
+elements.fuelType.fire('change');
+expectTruthy('biaya Pertamax ~Rp 840.000', elements.fuelCost.textContent.includes('840.000'));
+expectTruthy('label total fuel = Pertamax', elements.totalFuelUnit.textContent.includes('Pertamax'));
+expectTruthy('display harga Pertamax', elements.fuelPriceDisplay.textContent.includes('15.000'));
+
+elements.fuelType.value = 'solar';
+elements.fuelType.fire('change');
+expectTruthy('biaya Solar ~Rp 280.000', elements.fuelCost.textContent.includes('280.000'));
+
+elements.fuelType.value = 'pertalite';
+elements.fuelType.fire('change');
+expectTruthy('kembali biaya Pertalite', elements.fuelCost.textContent.includes('560.000'));
 
 console.log('\n=== Konversi ke Imperial ===');
 elements.btnImperial.fire('click');
@@ -121,7 +137,7 @@ expect('efisiensi (MPG)', elements.fuelEfficiency.value, 33.6);
 expect('jarak tempuh (mi)', elements.currentRange.textContent, 299.9);
 expectString('label jarak', elements.unitDistance.textContent, 'mil');
 expectString('label efisiensi', elements.unitEfficiency.textContent, 'MPG');
-expectString('label harga per galon', elements.priceUnit.textContent, 'galon');
+expectTruthy('display harga per galon', elements.fuelPriceDisplay.textContent.includes('/ galon'));
 
 console.log('\n=== Bahan bakar cukup (0 pengisian) ===');
 elements.tripDistance.value = '100';
@@ -137,7 +153,7 @@ elements.btnMetric.fire('click');
 expect('jarak total (km)', elements.tripDistance.value, 160.9);
 expect('efisiensi (L/100km)', elements.fuelEfficiency.value, 7);
 expectString('label jarak = km', elements.unitDistance.textContent, 'km');
-expectString('label harga per liter', elements.priceUnit.textContent, 'liter');
+expectTruthy('display harga per liter', elements.fuelPriceDisplay.textContent.includes('/ liter'));
 
 console.log('\n=== Persistensi local storage ===');
 expectTruthy('state tersimpan', Object.keys(storage).length === 1 && Boolean(storage['fuel-trip-planner']));
