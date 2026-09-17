@@ -142,6 +142,77 @@ function calculate() {
   $('stopsNeededUnit').textContent = stops === 0 ? 'tidak perlu mengisi' : 'kali pengisian';
   $('stopInterval').textContent = interval.toFixed(1);
   $('stopIntervalUnit').textContent = unit.distance + ' per pemberhentian';
+
+  renderTripVisual(dist, range, interval, stops, unit);
+}
+
+function renderTripVisual(dist, initialRange, interval, stops, unit) {
+  const mapEl = $('roadMap');
+  const pumpSection = $('pumpSection');
+  const noteBox = $('noteBox');
+
+  if (dist <= 0) {
+    mapEl.innerHTML = '';
+    pumpSection.innerHTML = '<div class="no-stops-msg">Masukkan jarak perjalanan untuk melihat hasil</div>';
+    noteBox.innerHTML = '';
+    return;
+  }
+
+  const stopsToMake = [];
+  let html = '<div class="road-line"></div>';
+
+  if (stops === 0) {
+    noteBox.innerHTML = '<strong>Bagus!</strong> Bahan bakar saat ini cukup untuk seluruh perjalanan sejauh '
+      + dist.toFixed(1) + ' ' + unit.distance + '. Tidak perlu berhenti mengisi bahan bakar.';
+    html += '<div class="road-fill" style="width:100%"></div>';
+  } else {
+    let pos = initialRange;
+    for (let i = 0; i < stops; i++) {
+      stopsToMake.push(pos);
+      pos += interval;
+    }
+
+    noteBox.innerHTML = '<strong>Petunjuk:</strong> Isi penuh saat mulai. Berhenti '
+      + stopsToMake.map((s, i) => '<strong>#' + (i + 1) + '</strong> di ' + s.toFixed(0) + ' ' + unit.distance).join(', ')
+      + ' dari perjalanan tempuh. Interval selanjutnya bertambah karena tangki penuh.';
+
+    const initialPct = Math.min((initialRange / dist) * 100, 100);
+    html += '<div class="road-fill" style="width:' + initialPct + '%"></div>';
+
+    stopsToMake.forEach((stopPos, i) => {
+      const pct = (stopPos / dist) * 100;
+      html += '<div class="road-stop" style="left:' + pct + '%">'
+        + '<div class="pump-icon">⛽</div>'
+        + '<div class="stop-label">#' + (i + 1) + ' — ' + stopPos.toFixed(0) + ' ' + unit.distance + '</div>'
+        + '</div>';
+    });
+  }
+
+  html += '<div class="road-marker-end road-start-label">🚗</div>';
+  html += '<div class="road-marker-end road-end-label">🏁</div>';
+
+  mapEl.innerHTML = html;
+
+  let pumpsHtml = '<div class="pump-row">';
+  if (stops === 0) {
+    pumpsHtml += '<div class="pump-icon-standalone active">🚗</div>';
+    pumpsHtml += '<div style="color:var(--green);font-size:0.8rem;font-weight:600;">Bahan bakar cukup — tidak perlu berhenti</div>';
+  } else {
+    pumpsHtml += '<div class="pump-icon-standalone active">🚗</div>';
+    for (let i = 0; i < stops; i++) {
+      pumpsHtml += '<div class="pump-icon-standalone active">⛽</div>';
+    }
+    pumpsHtml += '<div class="pump-icon-standalone active">🏁</div>';
+  }
+  pumpsHtml += '</div>';
+
+  pumpsHtml += '<div class="pump-row-label">Start';
+  for (let i = 0; i < stops; i++) {
+    pumpsHtml += ' → Isi #' + (i + 1);
+  }
+  pumpsHtml += ' → Tujuan</div>';
+
+  pumpSection.innerHTML = pumpsHtml;
 }
 
 function updateFuelBar(fuelPct) {
